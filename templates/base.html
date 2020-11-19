@@ -10,7 +10,7 @@
 <body class="h-100">
 
 {# need to make this a flex column for some reason?#}
-<div class="maincolumn container rounded mt-5 h-100 d-flex flex-column" >
+<div class="maincolumn container rounded mt-5 h-auto d-flex flex-column" >
     <div class="page-header row">
         <img class="img-fluid w-100 mx-auto border-dark" src="{% static 'images/header2.png' %}">
     </div>
@@ -32,7 +32,7 @@
 </nav>
 {% endif %}
 
-<div class="row justify-content-center h-100">
+<div class="row justify-content-center h-100 m-5">
 {% block content %}{% endblock %}
 </div>
 </div>
