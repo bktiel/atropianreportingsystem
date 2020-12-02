@@ -24,7 +24,22 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link active" href="#">Make Report <span class="sr-only">(current)</span></a>
+        {% if role is 0 %}
+            <a class="nav-item nav-link active" href="{% url 'reportsite:report' %}">Make Report </a>
+        {% endif %}
+        {% if role is 1 %}
+            <a class="nav-item nav-link active" href="{% url 'reportsite:report' %}">Make Report </a>
+            <a class="nav-item nav-link active" href="{% url 'reportsite:reportreview' %}">Review Reports </a>
+        {% endif %}
+        {% if role is 2 %}
+            <a class="nav-item nav-link active" href="{% url 'reportsite:reportreview' %}">Review Reports </a>
+            <a class="nav-item nav-link active" href="{% url 'reportsite:cityreview' %}">Review Cities </a>
+        {% endif %}
+        {% if role is 3 %}
+            <a class="nav-item nav-link active" href="{% url 'reportsite:updatecrimes' %}">Update Crimes </a>
+        {% endif %}
+        {#    all users can log out #}
+        <a class="nav-item nav-link active" href="{% url 'reportsite:logout' %}">Logout </a>
 {#      <a class="nav-item nav-link" href="#">Features</a>#}
 {#      <a class="nav-item nav-link" href="#">Pricing</a>#}
 {#      <a class="nav-item nav-link disabled" href="#">Disabled</a>#}

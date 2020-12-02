@@ -15,10 +15,14 @@ from django.core import signing
 import json
 from .populateCityTable import populateCityTable
 
+COOKIENAME="reportsystem"
+
+#actually login page
 def home_page(request):
     #render this specific request on the given template
     return render(request, 'home.html', {'loggedIn':False})
 
+#make a report page
 def make_report(request):
     #attempt cookie
     cookie=checkCookie(request)
@@ -26,9 +30,36 @@ def make_report(request):
         #grab all cities, crimes, and pass to report form
         cities=City.objects.all()
         crimes=Crime.objects.all()
-        return render(request, 'makereport.html', {'loggedIn':True, 'cities':cities, 'crimes':crimes})
+        return render(request, 'makereport.html', {'loggedIn':True, 'cities':cities, 'crimes':crimes, 'role':cookie["role"]})
     #if any steps fail, return forbidden
     return HttpResponse("AUTHENTICATION REQUIRED",status=401)
+
+#where agents and informants review reports
+def review_reports(request):
+    cookie=checkCookie(request)
+    if cookie is not None:
+        totalreports=Report.objects.all()
+        # reportList=[]
+        # for report in totalreports.values():
+        #     # dictreport["traitor"]=report.trat
+        #     # dictreport["patriot"]
+        #     # dictreport["city"]
+        #     # dictreport["crimes"]=[]
+        #     dictreport=dict(report)
+        #     #filter Crime objects based on connected report
+        #     for crime in Crime.objects.filter(report=report["id"]):
+        #         dictreport["crimes"].append(crime.crimeName)
+        #     reportList.append(dictreport)
+        return render(request, 'reviewreports.html',  {'reports':totalreports,'loggedIn':True,'role':cookie["role"]})
+
+#where agents review city danger
+def review_cities(request):
+    pass
+
+#where administrators can adjust the crime definitions
+def update_crimes(request):
+    pass
+
 
 @require_http_methods(["POST"])
 def login(request):
@@ -47,7 +78,7 @@ def login(request):
             #sign value with secret key using built in django encryption to save this dict for later
             value=signing.dumps({field:user[field] for field in ['role','id']})
             #save into cookie :)
-            response.set_signed_cookie('reportsystem',value)
+            response.set_signed_cookie(COOKIENAME,value)
             return response
         #if user no exist, redirect back to page (TODO: add error message for login failure)
     except ValueError:
@@ -55,6 +86,13 @@ def login(request):
         #probably nothing sent, just gonna ignore that..
     return HttpResponseRedirect(reverse('reportsite:home'))
 
+def logout(request):
+    logoutresponse=HttpResponseRedirect(reverse('reportsite:home'))
+    logoutresponse.delete_cookie(COOKIENAME)
+    return logoutresponse
+
+
+@require_http_methods(["POST"])
 #Receive report data POSTed from page, attempt to validate and commit to database. Tell client how it goes.
 def receive_report(request):
     #check cookie
@@ -116,7 +154,7 @@ def checkCookie(request):
     #attempt to grab cookie
     cookie=None
     try:
-        cookie=request.get_signed_cookie('reportsystem')
+        cookie=request.get_signed_cookie(COOKIENAME)
     except:
         return None
     #load cookie to pass to templating and authenticate

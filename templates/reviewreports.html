@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Reports</title>
+</head>
+{% block content %}
+    <div class="card h-auto align-self-center mt-4" style="width: 90%" id="reviewReportCard">
+        <div class="card-body">
+{#            <h5 class="card-title text-center">REVIEW REPORTS</h5>#}
+            <div class="row">
+                <div class="col-sm-4">
+                    <row>
+                        <h6 class="card-title text-center">REPORTS</h6>
+                            <div class="input-group pb-4">
+                                <input type="text" class="form-control" id="inputReportSearch" placeholder="Report details"
+                                       aria-label="Report" aria-describedby="button-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary orangebtn" type="button"
+                                            id="btnCheckCitizenName">
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+                    </row>
+                    <row>
+                        <div class="list-group" id="lstReports" style="overflow-y: scroll">
+                            {#https://stackoverflow.com/questions/4270330/django-show-a-manytomanyfield-in-a-template#}
+                            {% for report in reports %}
+                                <a class="list-group-item flex-row align-items-start p-2">
+                                    <h6 class="bold">Citizen: {{ report.traitor.firstName }} {{ report.traitor.lastName }}</h6>
+                                    <h6 class="bold">Time: {{ report.reportTime }}</h6>
+                                    <h6 class="bold">Crimes: </h6>
+                                    {% for  crime in report.crimeName.all %}
+                                        <li>{{ crime.crimeName }}</li>
+                                    {% endfor %}
+                                </a>
+                            {% endfor %}
+
+                        </div>
+                    </row>
+                </div>
+                <div class="col-sm-8 mt-4">
+                    <div class="row justify-content-md-center" style="height:40%;">
+                        <div class="w-75 orangebtn p-2 text-center" style=" height:20%;">REPORT </div>
+                        <div class="w-75 h-100 p-3" style="background-color: #303030; ">Report details.</div>
+                    </div>
+                    <div class="row justify-content-md-center">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+</html>

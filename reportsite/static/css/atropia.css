@@ -42,3 +42,13 @@ body {
     max-height: 200px;
     overflow-y: scroll;
 }
+
+.list-group-item{
+    background-color: #303030;
+    color: white;
+}
+.list-group-item:hover{
+    color:black;
+    text-decoration: none;
+    background-color: white;
+}
