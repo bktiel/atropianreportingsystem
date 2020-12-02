@@ -54,7 +54,7 @@ def login(request):
     return HttpResponseRedirect(reverse('reportsite:home'))
 
 def receive_report(request):
-    pass
+    return HttpResponse('blah')
 
 #check cookies, return cookie contents
 def checkCookie(request):

@@ -77,6 +77,7 @@
 {#                    <input type="text" id="city" class="d-">#}
 {#                    <input type="text" id="info" class="d-">#}
                     <button type="submit" class="btn orangebtn btn-primary w-50" id="btnSubmit">Submit Report</button>
+                {% csrf_token %}
 {#                </form>#}
             </div>
         </div>
@@ -118,11 +119,33 @@
             document.getElementById('lstCrimeBox').innerHTML+="<li>"+crime+"</li>";
         });
     });
+
+    //https://stackoverflow.com/questions/44525167/how-to-set-headers-to-get-or-post-function
+    $.ajaxSetup({
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    });
+    //submit post request to site containing report
     $(document).ready(function () {
         $("#btnSubmit").on("click", function () {
-            $.post("")
-        }
-    }
+            var citizen=document.getElementById("inputCitizenName").value;
+            var city=document.getElementById("dropdownCityButton").value;
+            var crimes=document.getElementById("lstCrimeBox").innerHTML;
+            var information=document.getElementById("txtRemarksArea").value;
+            var csrf=document.getElementsByName("csrfmiddlewaretoken").value;
+            $.post("{% url 'reportsite:receivereport' %}",
+                {
+                    citizen:citizen,
+                    city:city,
+                    crimes:crimes,
+                    information:information
+                })
+                .done(function(data){
+                    alert("Report Submitted");
+                });
+            });
+        });
     </script>
 {% endblock %}
 </html>
