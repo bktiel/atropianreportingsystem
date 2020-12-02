@@ -1,6 +1,9 @@
 from django.db import models
 
 # Create your models here.
+from django.utils.timezone import now
+
+
 class City(models.Model):
     cityName=models.CharField(max_length=64)
 
@@ -19,7 +22,7 @@ class Citizen(models.Model):
 
 class Report(models.Model):
     # reportID=models.IntegerField(primary_key=True)
-    reportTime=models.DateTimeField()
+    reportTime=models.DateTimeField(default=now)
     city=models.ForeignKey(City, on_delete=models.CASCADE)
     traitor=models.ForeignKey(Citizen, on_delete=models.CASCADE,related_name='+')
     patriot=models.ForeignKey(Citizen, on_delete=models.CASCADE,related_name='+')

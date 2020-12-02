@@ -1,6 +1,8 @@
+import bs4
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.timezone import now
 from django.views.decorators.http import require_http_methods
 
 # Views go here. Sorta like routes in Flask
@@ -53,8 +55,61 @@ def login(request):
         #probably nothing sent, just gonna ignore that..
     return HttpResponseRedirect(reverse('reportsite:home'))
 
+#Receive report data POSTed from page, attempt to validate and commit to database. Tell client how it goes.
 def receive_report(request):
-    return HttpResponse('blah')
+    #check cookie
+    cookie=checkCookie(request)
+    if cookie is not None:
+        #valid user
+        patriot=cookie['id']
+        # now validate sent data
+        validData = True
+        try:
+            traitor_first,traitor_last=request.POST["citizen"].split()
+        except:
+
+            return HttpResponse("Failure")
+        city=request.POST["city"].strip()
+        info=request.POST["info"]
+        #validate data before doing anything intensive
+        if not (Citizen.objects.filter(firstName=traitor_first.strip(), lastName=traitor_last.strip()).exists()):
+            validData=False
+        if not (City.objects.filter(cityName=city).exists()):
+            validData=False
+        #crimes needs to be sanitized before use
+        crimes=[]
+        crimeSoup=bs4.BeautifulSoup(request.POST["crimes"])
+        for item in crimeSoup.findAll('li'):
+            newCrime=item.text.strip()
+            #if any of these bad, data is bad
+            if Crime.objects.filter(crimeName=newCrime).exists():
+                crimes.append(newCrime)
+            else:
+                validData=False
+                break
+        #if all data authenticated against database, go ahead and create a report
+        if validData:
+            try:
+                newRecord=Report()
+                newRecord.patriot=Citizen.objects.get(pk=patriot)
+                newRecord.city=City.objects.get(cityName=city)
+                newRecord.traitor=Citizen.objects.get(firstName=traitor_first.strip(), lastName=traitor_last.strip())
+                newRecord.remarks=info
+                newRecord.priority=0
+                newRecord.save()
+                #now add crimes :)
+                for crime in crimes:
+                    newRecord.crimeName.add(Crime.objects.get(crimeName=crime))
+                #commit
+                newRecord.save()
+            except Exception as e:
+                print("Error",e)
+                return HttpResponse("Failure")
+            return HttpResponse("Success")
+
+        #Failure
+        return HttpResponse("Failure")
+
 
 #check cookies, return cookie contents
 def checkCookie(request):

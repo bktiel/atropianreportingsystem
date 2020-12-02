@@ -130,7 +130,7 @@
     $(document).ready(function () {
         $("#btnSubmit").on("click", function () {
             var citizen=document.getElementById("inputCitizenName").value;
-            var city=document.getElementById("dropdownCityButton").value;
+            var city=document.getElementById("dropdownCityButton").innerText;
             var crimes=document.getElementById("lstCrimeBox").innerHTML;
             var information=document.getElementById("txtRemarksArea").value;
             var csrf=document.getElementsByName("csrfmiddlewaretoken").value;
@@ -139,10 +139,10 @@
                     citizen:citizen,
                     city:city,
                     crimes:crimes,
-                    information:information
-                })
-                .done(function(data){
-                    alert("Report Submitted");
+                    info:information
+                },
+                function(data){
+                    alert(data);
                 });
             });
         });
