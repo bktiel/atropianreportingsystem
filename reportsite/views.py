@@ -50,7 +50,7 @@ def review_reports(request):
         #     for crime in Crime.objects.filter(report=report["id"]):
         #         dictreport["crimes"].append(crime.crimeName)
         #     reportList.append(dictreport)
-        return render(request, 'reviewreports.html',  {'reports':totalreports,'loggedIn':True,'role':cookie["role"]})
+        return render(request, 'reviewreports.html',  {'reports':totalreports,'ten':range(11),'loggedIn':True,'role':cookie["role"]})
 
 #where agents review city danger
 def review_cities(request):
