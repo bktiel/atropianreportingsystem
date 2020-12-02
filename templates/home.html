@@ -7,50 +7,55 @@
     <title>Home</title>
 </head>
 {% block content %}
-{# this is specific enough to this page I don't really want to bother to put it in a separate js file#}
-<script>
-    function showLogin(){
-        document.getElementById("cardLoginPanel").className="card visible h-auto w-75 align-self-center";
-        document.getElementById("cardWarningBanner").className="collapse";
-    }
-</script>
-{#<div class="align-self-center w-50">#}
+    {# this is specific enough to this page I don't really want to bother to put it in a separate js file#}
+    <script>
+        function showLogin() {
+            document.getElementById("cardLoginPanel").className = "card visible h-auto w-75 align-self-center";
+            document.getElementById("cardWarningBanner").className = "collapse";
+        }
+    </script>
+    {#<div class="align-self-center w-50">#}
 
     <div class="card text-center h-auto w-50 align-self-center mt-4" id="cardWarningBanner">
-      <div class="card-header">
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">ATTENTION</h5>
-        <p class="card-text">Use of this information system is contingent with compliance with Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        <a href="#" class="btn btn-primary orangebtn" id="btnAcceptWarning" onclick="showLogin()">Accept</a>
-      </div>
+        <div class="card-header">
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">ATTENTION</h5>
+            <p class="card-text">Use of this information system is contingent with compliance with Duis aute irure dolor
+                in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+                cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <a href="#" class="btn btn-primary orangebtn" id="btnAcceptWarning" onclick="showLogin()">Accept</a>
+        </div>
     </div>
 
 
 
-{#    Login panel is hidden at the start#}
-<div class="card h-auto w-75 align-self-center collapse" id="cardLoginPanel">
-      <div class="card-body">
-          <h5 class="card-title text-center">LOGIN</h5>
-          <div class="row">
-          <div class="form-group col-sm-8">
-              <label for="inputCitizenID">Citizen ID</label>
-              <input type="email" class="form-control" id="inputCitizenID" placeholder="Enter Citizen ID">
-              <label for="inputPassword">Password</label>
-              <input type="password" class="form-control" id="inputPassword" placeholder="Enter Password">
-              <div class="d-flex justify-content-center pt-3 ">
-                  <a href="#" class="btn btn-primary w-50 orangebtn" id="btnLogin">Login</a>
-              </div>
-          </div>
-{#          <div class="col-sm-4">#}
-            <img class="col-sm-4" src="{% static 'images/anon.jpg' %}" id="citizenPreview">
-{#          </div>#}
+    {#    Login panel is hidden at the start#}
+    <div class="card h-auto w-75 align-self-center collapse" id="cardLoginPanel">
+        <div class="card-body">
+            <h5 class="card-title text-center">LOGIN</h5>
+            <div class="row">
+                {#using this url dispatcher, whatever url that has name login will be proponent of form action. kinda neat#}
+                <form class="form-group col-sm-8" id="loginform" action="{% url 'reportsite:login' %}" method="post">
+                    {% csrf_token %}
+                    <label for="inputCitizenID">Citizen ID</label>
+                    <input type="text" class="form-control" id="inputCitizenID" name="id" placeholder="Enter Citizen ID">
+                    <label for="inputPassword">Password</label>
+                    <input type="password" class="form-control" id="inputPassword" name="pass" placeholder="Enter Password">
+                    <div class="d-flex justify-content-center pt-3 ">
+                        {#SUBMIT FORM (not sure why btn doesn't work here)#}
+                        <input class="btn btn-primary w-50 orangebtn" id="btnLogin" type="submit">
+                    </div>
+                </form>
+                <img class="col-sm-4" src="{% static 'images/anon.jpg' %}" id="citizenPreview">
             </div>
 
+        </div>
 
-      </div>
+
     </div>
-{#</div>#}
+    </div>
+    {#</div>#}
 {% endblock %}
 
 </html>
