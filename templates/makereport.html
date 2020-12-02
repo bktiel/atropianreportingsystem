@@ -27,31 +27,41 @@
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Select City
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" >
                                 <input class="form-control" id="userInput" type="text" placeholder="Search..">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="#">Something else here</a>
+                                {% for record in cities %}
+                                    <a class="dropdown-item">{{ record.cityName }}</a>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="dropdown col-sm-3">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownCityButton"
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownCrimeButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Select Crime
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <input class="form-control" id="userInput" type="text" placeholder="Search..">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                                {% for record in crimes %}
+                                    <a class="dropdown-item crime-dropdown-item" id="{{ record.id }}">{{ record.crimeName }}</a>
+                                    <a class="d-none">{{ record.description }}</a>
+                                {% endfor %}
                         </div>
                     </div>
-                    <div class="col-sm-9 my-auto">
-                        Description of Crime
+                    <div class="col-sm-7 my-auto">
+                        <a id="lblCrimeDesc">Description of Crime</a>
                     </div>
+                    <div class="col-sm-2 my-auto">
+                         <a class="btn orangebtn d-none" id="btnAddCrime">Add</a>
+                    </div>
+                </div>
+                <div class="row m-3 justify-content-md-center" id="crimeBox" >
+                    <a>Crimes:</a>
+                    {# where crimes will actually go #}
+                    <ul id="lstCrimeBox">
+
+                    </ul>
                 </div>
                 <div class="row mt-3">
                     <div class="col">
@@ -61,10 +71,17 @@
                 </div>
             </div>
             <div class="d-flex justify-content-center pt-3 ">
-                <a href="#" class="btn orangebtn btn-primary w-50" id="btnSubmit">Submit Report</a>
+{#                <form class="w-50">#}
+{#                    <input type="text" id="citizenID" class="d-">#}
+{#                    <input type="text" id="crimeList" class="d-">#}
+{#                    <input type="text" id="city" class="d-">#}
+{#                    <input type="text" id="info" class="d-">#}
+                    <button type="submit" class="btn orangebtn btn-primary w-50" id="btnSubmit">Submit Report</button>
+{#                </form>#}
             </div>
         </div>
     </div>
+
 
     {#  Script for making dropdown work with a searchable input  #}
     <script>
@@ -77,6 +94,35 @@
                 });
             });
         });
+    {# Script to make crime description update with selections#}
+        $(document).ready(function () {
+        $(".crime-dropdown-item").on("click", function () {
+            //the next item in the list is the description (is hidden)
+            var desc = $(this).next()[0].innerHTML;
+            document.getElementById('lblCrimeDesc').innerHTML = desc;
+            //also make "GO" button visible if not already
+            //do a check, make sure selection not already in crimebox list
+            var selectionText=document.getElementById('dropdownCrimeButton').innerText;
+            if(!document.getElementById('lstCrimeBox').innerHTML.includes(selectionText)){
+                document.getElementById('btnAddCrime').classList="btn orangebtn";
+            }
+        });
+    });
+    {# On crimeAdd button, append to list #}
+    $(document).ready(function () {
+        $("#btnAddCrime").on("click", function () {
+            //hide button again
+            document.getElementById('btnAddCrime').classList+=" d-none";
+            //add crime to crimebox
+            var crime=document.getElementById('dropdownCrimeButton').innerText;
+            document.getElementById('lstCrimeBox').innerHTML+="<li>"+crime+"</li>";
+        });
+    });
+    $(document).ready(function () {
+        $("#btnSubmit").on("click", function () {
+            $.post("")
+        }
+    }
     </script>
 {% endblock %}
 </html>

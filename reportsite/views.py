@@ -21,10 +21,10 @@ def make_report(request):
     #attempt cookie
     cookie=checkCookie(request)
     if cookie is not None:
-
         #grab all cities, crimes, and pass to report form
-
-        return render(request, 'makereport.html', {'loggedIn':True})
+        cities=City.objects.all()
+        crimes=Crime.objects.all()
+        return render(request, 'makereport.html', {'loggedIn':True, 'cities':cities, 'crimes':crimes})
     #if any steps fail, return forbidden
     return HttpResponse("AUTHENTICATION REQUIRED",status=401)
 
@@ -52,6 +52,9 @@ def login(request):
         pass
         #probably nothing sent, just gonna ignore that..
     return HttpResponseRedirect(reverse('reportsite:home'))
+
+def receive_report(request):
+    pass
 
 #check cookies, return cookie contents
 def checkCookie(request):

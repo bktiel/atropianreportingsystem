@@ -6,5 +6,6 @@ app_name = 'reportsite'
 urlpatterns = [
     path('', views.home_page, name='home'),
     path('login', views.login, name='login'),
-    path('report', views.make_report, name='report')
+    path('report', views.make_report, name='report'),
+    path('receivereport', views.receive_report, name='receivereport')
     ]
