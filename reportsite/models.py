@@ -32,8 +32,8 @@ class Report(models.Model):
 
 class Comment(models.Model):
     # commentID=models.IntegerField(primary_key=True)
-    commentTime=models.DateTimeField()
-    reportID=models.ManyToManyField(Report)
+    commentTime=models.DateTimeField(default=now)
+    reportID=models.ForeignKey(Report, on_delete=models.CASCADE)
     informant=models.ForeignKey(Citizen, on_delete=models.CASCADE)
     priority=models.SmallIntegerField()
     content=models.TextField(max_length=255)

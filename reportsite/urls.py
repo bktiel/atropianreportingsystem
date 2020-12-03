@@ -10,6 +10,7 @@ urlpatterns = [
     path('report', views.make_report, name='report'),
     path('receivereport', views.receive_report, name='receivereport'),
     path('reportreview', views.review_reports, name='reportreview'),
+    path('receivecomment', views.receive_comment, name='receivecomment'),
     path('cityreview', views.review_cities, name='cityreview'),
     path('updatecrimes', views.update_crimes, name='updatecrimes'),
 

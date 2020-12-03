@@ -14,66 +14,124 @@
                 <div class="col-sm-4">
                     <row>
                         <h6 class="card-title text-center">REPORTS</h6>
-                        <div class="input-group pb-4">
-                            <input type="text" class="form-control" id="inputReportSearch" placeholder="Report details"
-                                   aria-label="Report" aria-describedby="button-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary orangebtn" type="button"
-                                        id="btnCheckCitizenName">
-                                    Search
-                                </button>
+                        {% if role is 2 %}
+                            <div class="input-group pb-4">
+                                <input type="text" class="form-control" id="inputReportSearch"
+                                       placeholder="Report details"
+                                       aria-label="Report" aria-describedby="button-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary orangebtn" type="button"
+                                            id="btnCheckCitizenName">
+                                        Search
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     </row>
                     <row>
-                        <div class="list-group" id="lstReports" style="overflow-y: scroll">
+                        <div class="list-group" id="lstReports" style="overflow-y: scroll; max-height: 400px;"
+                             role="tablist">
                             {#https://stackoverflow.com/questions/4270330/django-show-a-manytomanyfield-in-a-template#}
                             {% for report in reports %}
-                                <a class="list-group-item flex-row align-items-start p-2">
+                                <a class="list-group-item lstReportsItem flex-row align-items-start p-2"
+                                   role="tab" data-toggle="list" href="#list-{{ report.id }}">
                                     <h6 class="bold">
                                         Citizen: {{ report.traitor.firstName }} {{ report.traitor.lastName }}</h6>
                                     <h6 class="bold">Time: {{ report.reportTime }}</h6>
+                                    {% if role is 2 %}<h6 class="bold">City: {{ report.city.cityName }}</h6>{% endif %}
                                     <h6 class="bold">Crimes: </h6>
                                     {% for  crime in report.crimeName.all %}
                                         <li>{{ crime.crimeName }}</li>
                                     {% endfor %}
+                                    <p class="d-none">{{ report.id }}</p>
                                 </a>
                             {% endfor %}
 
                         </div>
                     </row>
                 </div>
-                <div class="col-sm-8 mt-4">
-                    <div class="row justify-content-md-center" style="height:40%;">
-                        <div class="w-75 orangebtn p-2 text-center mb-0" style=" height:20%;">REPORT</div>
-                        <div class="w-75 mt-0 p-3" style="background-color: #303030; height:80%">Report details.</div>
-                    </div>
-                    <div class="row justify-content-md-center" style="height:60%">
-                        <div class="row w-100" style="height:20%;">
-                            <div class="col-sm-1">
-
-                            </div>
-                            <div class="align-items-center col-sm-11 mt-3 pr-0">
-                                {% for i in ten %}
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio{{ i }}"
-                                               value="{{ i }}">
-                                        <label class="form-check-label" for="inlineRadio{{ i }}">{{ i }}</label>
+                <div class="col-sm-8 mt-4 h-auto" >
+                    <div class="container">
+                    <div class="row justify-content-md-center h-50">
+                        <div class="col justify-content-center h-100">
+                            <div class="orangebtn p-2 text-center mb-0 mr-4 ml-4" style=" height:20%;">REPORT</div>
+                            <div class="mt-0 p-3 d-flex flex-column mr-4 ml-4 "
+                                 style="background-color: #303030; height:80%; min-height: 150px;">
+                                <div class="tab-content mb-3"  id="tabReportDetailsContent" >
+                                {% for report in reports %}
+                                    <div class="tab-pane fade" id="list-{{ report.id }}" role="tabpanel"
+                                         aria-labelledby="list-profile-list">
+                                        {{ report.remarks }}<br>
+                                        <a>Crimes: </a>
+                                        {% for crime in report.crimeName.all %}
+                                            <a href="#" class="reportDetailsCrimeTypeDesc">{{ crime.crimeName }}</a>
+                                        {% endfor %}
                                     </div>
                                 {% endfor %}
+                                </div>
+                            {% if role is 2 %}
+                                <div class="mt-auto align-self-center">
+                                    <button class="btn orangebtn  btn-primary "
+                                            id="btnEscalateReport">Escalate Report
+                                    </button>
+                                </div>
+                            {% endif %}
                             </div>
                         </div>
-                        <div class="row d-flex justify-content-center w-100" style="height: 80%;">
-                            <label for="txtRemarksArea">Comment</label>
-                            <textarea class="form-control mr-3 ml-3" id="txtRemarksArea" rows="3"></textarea>
-                            <button type="submit" class="btn orangebtn align-self-center btn-primary w-50" id="btnSubmit">Submit Report</button>
-                        </div>
+                    </div>
+                    {# Form only visible for informants, agents have different view #}
+                    {% if role is 1 %}
+                        <form class="row h-50 justify-content-md-center mt-3"
+                              action="{% url 'reportsite:receivecomment' %}" method="post">
+
+                            <div class="row w-100" >
+                                <div class="col-sm-1">
+
+                                </div>
+                                <div class="align-items-center col-sm-11 mt-3 pr-0">
+                                    {% for i in ten %}
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="inlineRadioOptions"
+                                                   id="inlineRadio{{ i }}"
+                                                   value="{{ i }}">
+                                            <label class="form-check-label" for="inlineRadio{{ i }}">{{ i }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="row d-flex justify-content-center w-100 form-group" >
+                                <label for="txtRemarksArea">Comment</label>
+                                <input id="txtReportID" type="text" name="reportID" class="form-control d-none">
+                                <textarea class="form-control mr-3 ml-3" id="txtRemarksArea" name="remarks"
+                                          rows="3"></textarea>
+                                <button type="submit" class="btn orangebtn align-self-center mt-3 btn-primary w-50"
+                                        id="btnSubmit">Submit Report
+                                </button>
+                            </div>
+                            {% csrf_token %}
+                        </form>
+                    {% endif %}
+                    {% if role is 2 %}
+                        <div class="row h-50">safasfs</div>
+                    {% endif %}
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
+    <script>
+        //load crimes into js object
+        data_from_django = {{ crimes }};
+        widget.init(data_from_django);
+        //script for report selectio to pull up report details
+
+        $(document).ready(function () {
+            //what did we do before jquery?
+            $('.list-group-item').click(function () {
+                var selectedReport = $(this).children("p").html();
+                $('#txtReportID').val(selectedReport)
+            });
+        });
+    </script>
 {% endblock %}
 </html>

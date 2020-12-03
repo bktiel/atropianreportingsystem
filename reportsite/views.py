@@ -38,19 +38,36 @@ def make_report(request):
 def review_reports(request):
     cookie=checkCookie(request)
     if cookie is not None:
-        totalreports=Report.objects.all()
-        # reportList=[]
-        # for report in totalreports.values():
-        #     # dictreport["traitor"]=report.trat
-        #     # dictreport["patriot"]
-        #     # dictreport["city"]
-        #     # dictreport["crimes"]=[]
-        #     dictreport=dict(report)
-        #     #filter Crime objects based on connected report
-        #     for crime in Crime.objects.filter(report=report["id"]):
-        #         dictreport["crimes"].append(crime.crimeName)
-        #     reportList.append(dictreport)
+        totalreports=None
+        #if cookie role is 2, give full. If 1, give only in their city
+        if cookie["role"]==1:
+            #get current user city
+            currentUserCity=City.objects.get(citizen__id=cookie["id"])
+            totalreports=Report.objects.filter(city=currentUserCity)
+        elif cookie["role"]==2:
+            totalreports=Report.objects.all()
+        else:
+            return HttpResponse("UNAUTHORIZED USER",status=403)
         return render(request, 'reviewreports.html',  {'reports':totalreports,'ten':range(11),'loggedIn':True,'role':cookie["role"]})
+
+#receive comments from report review
+def receive_comment(request):
+    cookie = checkCookie(request)
+    if cookie is not None:
+        if cookie["role"] in (1,2):
+            try:
+                #attempt to retrieve items from request
+                priority=int(request.POST["inlineRadioOptions"])
+                remarks=request.POST["remarks"]
+                report=Report.objects.get(id=request.POST["reportID"])
+                #commit to comment entry
+                newComment=Comment(content=remarks,priority=priority)
+                newComment.informant=Citizen.objects.get(id=cookie["id"])
+                newComment.reportID=report
+                newComment.save()
+            except:
+                pass
+            return HttpResponseRedirect(reverse('reportsite:reportreview'))
 
 #where agents review city danger
 def review_cities(request):
@@ -116,12 +133,16 @@ def receive_report(request):
             validData=False
         #crimes needs to be sanitized before use
         crimes=[]
+        # set to invalid to start
+        validData=False
         crimeSoup=bs4.BeautifulSoup(request.POST["crimes"])
         for item in crimeSoup.findAll('li'):
             newCrime=item.text.strip()
             #if any of these bad, data is bad
             if Crime.objects.filter(crimeName=newCrime).exists():
                 crimes.append(newCrime)
+                #if at least one succeeds, set to valid to overwrite
+                validData=True
             else:
                 validData=False
                 break

@@ -17,3 +17,6 @@ def populateCityTable():
         if li.a is not None:
             thisName = li.a.get_text()
             City.objects.create(cityName=thisName)
+
+
+#populateCityTable()
