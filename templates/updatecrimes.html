@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Review Reports</title>
+    <title>Update Crimes</title>
 </head>
 {% block content %}
     <div class="card h-auto align-self-center mt-4" style="width: 90%" id="reviewReportCard">
@@ -16,21 +16,8 @@
                             <h6 class="card-title text-center align-items-center">CRIMES</h6>
                         </div>
                         <div class="col-sm-4">
-                            <a href="#" class="btn btn-primary w-100 orangebtn" id="btnNewCrime"><h3>+</h3></a>
+                            <a class="btn btn-primary w-100 orangebtn" id="btnNewCrime"><h3>+</h3></a>
                         </div>
-                        {% if role is 2 %}
-                            <div class="input-group pb-4">
-                                <input type="text" class="form-control" id="inputReportSearch"
-                                       placeholder="Report details"
-                                       aria-label="Report" aria-describedby="button-addon2">
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary orangebtn" type="button"
-                                            id="btnCheckCitizenName">
-                                        Search
-                                    </button>
-                                </div>
-                            </div>
-                        {% endif %}
                     </div>
                     <div>
                         <div class="list-group" id="lstReports" style="overflow-y: scroll; max-height: 400px;"
@@ -41,6 +28,10 @@
                                     <h6 class="bold">
                                         {{ crime.crimeName }}
                                     </h6>
+                                    {# cheap way of using passed vars is just to hide them in html #}
+                                    <p class="d-none crimeID">{{ crime.id }}</p>
+                                    <p class="d-none crimeDescription"> {{ crime.description }}</p>
+                                    <p class="d-none crimeSeverity">{{ crime.severity }}</p>
                                 </a>
                             {% endfor %}
 
@@ -53,7 +44,7 @@
                             <div class="col justify-content-center h-100">
                                 <div class="orangebtn p-2 text-center mb-0 mr-4 ml-4" style=" height:20%;">
                                     CRIME: <a id="lblCrime"></a></div>
-                                <form>
+                                <form id="formCrime" action="{% url 'reportsite:receivecrimeupdate' %}" method="post">
                                     <div class="row form-group mt-3">
                                         <label for="inputCrimeName col-form-label col-sm-2">Crime Name:</label>
                                         <div class="col-sm-5">
@@ -63,26 +54,28 @@
                                         </div>
                                         <label for="inputCrimeName col-form-label col-sm-2">Severity:</label>
                                         <div class="col-sm-2">
-                                            <select id="crimeSeverity" class="form-control">
+                                            <select id="crimeSeverity" name="severity" class="form-control">
                                                 {% for num in severityMax %}
-                                                    <option>{{ num }}</option>
+                                                    <option value="{{ num }}">{{ num }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                     </div>
+                                <input id="txtReportID" type="text" name="crime" class="form-control d-none">
                                     <div class="row">
                                         <label for="txtCrimeDescription">Crime Description:</label>
                                         <textarea class="form-control mr-3 ml-3"
-                                                  id="txtCrimeDescription" name="remarks"
+                                                  id="txtCrimeDescription" name="description"
                                                   rows="3"></textarea>
                                     </div>
                                     <div class="row mt-3 justify-content-center">
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-3">
-                                            <a href="#" class="btn btn-primary w-100 btn-danger" id="btnDeleteCrime">Delete</a>
+                                            <button type="submit" name="changeType" value="delete" class="btn btn-primary w-100 btn-danger" id="btnDeleteCrime">Delete</button>
                                         </div>
                                         <div class="col-sm-3">
-                                            <a href="#" class="btn btn-primary w-100 btn-success" id="btnUpdateCrime">Update</a>
+                                            {% csrf_token %}
+                                            <button name="changeType" value="update" class="btn btn-primary w-100 btn-success" type="submit" id="btnUpdateCrime">Update</button>
                                         </div>
                                         <div class="col-sm-3">
                                         </div>
@@ -95,31 +88,40 @@
         </div>
     </div>
     <script>
-
+        //on list item selected, copy contents to fields
         //update hidden input with the value of the selected report
         $(document).ready(function () {
             //what did we do before jquery?
             $('.list-group-item').click(function () {
                 var selectedReport = $(this).children("p").html();
-                $('#txtReportID').val(selectedReport)
+                $('#txtReportID').val(selectedReport);
+                //copy vals over to other form elements
+                var crimeName=$(this).children("h6").html().toString();
+                $('#inputCrimeName').val(crimeName.trim());
+                $('#lblCrime').html(crimeName.trim());
+                var crimeDesc=$(this).children("p.crimeDescription").html().toString();
+                $('#txtCrimeDescription').val(crimeDesc.trim());
+                var crimeSeverity=$(this).children("p.crimeSeverity").html().toString();
+                $('#crimeSeverity').val(crimeSeverity.trim());
+                //if clicked on an element, change the Update button to read Update if it isn't already
+                $('#btnUpdateCrime').html("Update");
+                $('#btnUpdateCrime').val("update");
             });
         });
 
-        //jquery script for escalation button (adds to investigation queue if successful)
+        //what to do when the new crime button clicked
         $(document).ready(function () {
-            //what did we do before jquery?
-            $('#btnEscalateReport').click(function () {
-                var report = document.getElementById("txtReportID").value;
-                $.post("{% url 'reportsite:receiveescalation' %}",
-                    {
-                        reportID: report
-                    },
-                    function (data) {
-                        alert(data);
-                    });
+            $('#btnNewCrime').click(function () {
+                //update becomes create button to show what's going on
+                $('#btnUpdateCrime').html("Create");
+                //clear all fields
+                $('#txtCrimeDescription').val("");
+                $('#inputCrimeName').val("");
+                $('#crimeSeverity').val("0");
+                $('#lblCrime').html("New Crime");
+                $('#btnUpdateCrime').val("new");
             });
         });
-
     </script>
 {% endblock %}
 </html>

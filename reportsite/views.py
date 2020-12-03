@@ -1,3 +1,5 @@
+from logging import exception
+
 import bs4
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -137,6 +139,51 @@ def update_crimes(request):
             return HttpResponse("UNAUTHORIZED ACCESS")
     #don't let in if not right cookie
     return HttpResponse("UNAUTHORIZED ACCESS")
+
+def receive_crime_update(request):
+    cookie=checkCookie(request)
+    if cookie is not None:
+        try:
+            if cookie['role']==3:
+                #updates can take several forms, check to see which one
+                if request.POST["changeType"]=="update" or request.POST["changeType"]=="new":
+                    name,desc,severity=None,None,None
+                    #make sure name has characters. This is crucial.
+                    if len(str(request.POST['crimeName']).strip())>0:
+                        name=request.POST['crimeName']
+                    else:
+                        raise ValueError
+                    #make sure severity falls within accepted range
+                    if int(request.POST['severity']) not in range(MAX_SEVERITY):
+                        severity=0
+                    else:
+                        severity=int(request.POST['severity'])
+                    #not super concerned about description, that can be blank
+                    if len(str(request.POST["description"]).strip())>0:
+                        desc=request.POST["description"]
+                    else:
+                        desc = ""
+                    #branching
+                    crime=None
+                    if request.POST["changeType"]=="new":
+                        crime=Crime()
+                    else:
+                        #verify this record exists, should raise exception if no bien
+                        crime=Crime.objects.get(pk=request.POST["crime"])
+                    #pass parameters
+                    crime.description=desc
+                    crime.crimeName=name
+                    crime.severity=severity
+                    #save and exit
+                    crime.save()
+                elif request.POST['changeType']=="delete":
+                    #get object
+                    crime = Crime.objects.get(pk=request.POST["crime"])
+                    crime.delete()
+
+                return HttpResponseRedirect(reverse("reportsite:updatecrimes"))
+        except:
+            return HttpResponse("UNAUTHORIZED ACCESS")
 
 @require_http_methods(["POST"])
 def login(request):
