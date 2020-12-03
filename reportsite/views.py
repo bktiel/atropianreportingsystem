@@ -16,6 +16,7 @@ import json
 from .populateCityTable import populateCityTable
 
 COOKIENAME="reportsystem"
+MAX_SEVERITY=80
 
 #actually login page
 def home_page(request):
@@ -124,8 +125,18 @@ def review_cities(request):
 
 #where administrators can adjust the crime definitions
 def update_crimes(request):
-    pass
-
+    cookie=checkCookie(request)
+    if cookie is not None:
+        # check is actually admin
+        try:
+            #retrieve crimes
+            crimes=Crime.objects.all()
+            #render page
+            return render(request,'updatecrimes.html',{'severityMax':range(MAX_SEVERITY),'crimes':crimes,'loggedIn':True,'role':cookie["role"]})
+        except:
+            return HttpResponse("UNAUTHORIZED ACCESS")
+    #don't let in if not right cookie
+    return HttpResponse("UNAUTHORIZED ACCESS")
 
 @require_http_methods(["POST"])
 def login(request):

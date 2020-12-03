@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Reports</title>
+</head>
+{% block content %}
+    <div class="card h-auto align-self-center mt-4" style="width: 90%" id="reviewReportCard">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="row mb-2">
+                        <div class="col-sm-8 d-flex align-items-center justify-content-center">
+                            <h6 class="card-title text-center align-items-center">CRIMES</h6>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="#" class="btn btn-primary w-100 orangebtn" id="btnNewCrime"><h3>+</h3></a>
+                        </div>
+                        {% if role is 2 %}
+                            <div class="input-group pb-4">
+                                <input type="text" class="form-control" id="inputReportSearch"
+                                       placeholder="Report details"
+                                       aria-label="Report" aria-describedby="button-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary orangebtn" type="button"
+                                            id="btnCheckCitizenName">
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="list-group" id="lstReports" style="overflow-y: scroll; max-height: 400px;"
+                             role="tablist">
+                            {% for crime in crimes %}
+                                <a class="list-group-item flex-row align-items-start p-2"
+                                   role="tab" data-toggle="list" href="#crime-{{ crime.id }}">
+                                    <h6 class="bold">
+                                        {{ crime.crimeName }}
+                                    </h6>
+                                </a>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 mt-4 h-auto">
+                    <div class="container">
+                        <div class="row justify-content-md-center h-50">
+                            <div class="col justify-content-center h-100">
+                                <div class="orangebtn p-2 text-center mb-0 mr-4 ml-4" style=" height:20%;">
+                                    CRIME: <a id="lblCrime"></a></div>
+                                <form>
+                                    <div class="row form-group mt-3">
+                                        <label for="inputCrimeName col-form-label col-sm-2">Crime Name:</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control " id="inputCrimeName"
+                                                   name="crimeName"
+                                                   placeholder="Enter Crime Name">
+                                        </div>
+                                        <label for="inputCrimeName col-form-label col-sm-2">Severity:</label>
+                                        <div class="col-sm-2">
+                                            <select id="crimeSeverity" class="form-control">
+                                                {% for num in severityMax %}
+                                                    <option>{{ num }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label for="txtCrimeDescription">Crime Description:</label>
+                                        <textarea class="form-control mr-3 ml-3"
+                                                  id="txtCrimeDescription" name="remarks"
+                                                  rows="3"></textarea>
+                                    </div>
+                                    <div class="row mt-3 justify-content-center">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-3">
+                                            <a href="#" class="btn btn-primary w-100 btn-danger" id="btnDeleteCrime">Delete</a>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <a href="#" class="btn btn-primary w-100 btn-success" id="btnUpdateCrime">Update</a>
+                                        </div>
+                                        <div class="col-sm-3">
+                                        </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        //update hidden input with the value of the selected report
+        $(document).ready(function () {
+            //what did we do before jquery?
+            $('.list-group-item').click(function () {
+                var selectedReport = $(this).children("p").html();
+                $('#txtReportID').val(selectedReport)
+            });
+        });
+
+        //jquery script for escalation button (adds to investigation queue if successful)
+        $(document).ready(function () {
+            //what did we do before jquery?
+            $('#btnEscalateReport').click(function () {
+                var report = document.getElementById("txtReportID").value;
+                $.post("{% url 'reportsite:receiveescalation' %}",
+                    {
+                        reportID: report
+                    },
+                    function (data) {
+                        alert(data);
+                    });
+            });
+        });
+
+    </script>
+{% endblock %}
+</html>
