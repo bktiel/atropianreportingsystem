@@ -82,6 +82,9 @@ def receive_escalation(request):
             report=Report.objects.get(id=report)
         except:
             return HttpResponse("BAD DATA")
+        #no duplicates in InvestigationQueue
+        if InvestigationQueue.objects.filter(reportID=report):
+            return HttpResponse("BAD DATA")
         #verify sender
         agent=None
         try:
@@ -97,7 +100,27 @@ def receive_escalation(request):
 
 #where agents review city danger
 def review_cities(request):
-    pass
+    #verify cookie
+    cookie=checkCookie(request)
+    if cookie is not None:
+        #grab cities
+        if cookie["role"]==2:
+            #dict will store cities and risk values to pass to templating
+            dictCities={}
+            cities=City.objects.all()
+            for city in cities:
+                totalRisk=0
+                #first isolate reports that are for this city and not on the investigation queue
+                for report in Report.objects.filter(investigationqueue__isnull=True).filter(city=city):
+                    #check every comment for a given report and add priority given by user to the count
+                    for comment in Comment.objects.filter(reportID=report):
+                        totalRisk+=comment.priority
+                dictCities.update({city.cityName:totalRisk})
+
+
+
+            return render(request,'reviewcities.html',{'cities':dictCities,'loggedIn':True,'role':cookie["role"]})
+    return HttpResponse("UNAUTHORIZED ACCESS")
 
 #where administrators can adjust the crime definitions
 def update_crimes(request):
@@ -116,7 +139,14 @@ def login(request):
             #make response with cookie
             user=query.values()[0]
             #user found, redirect to page when done
-            response=HttpResponseRedirect(reverse('reportsite:report'))
+            #different endpoint depending on user role
+            response=None
+            if user['role']<=1:
+                response=HttpResponseRedirect(reverse('reportsite:report'))
+            elif user['role']==2:
+                response = HttpResponseRedirect(reverse('reportsite:reportreview'))
+            elif user['role']==3:
+                response = HttpResponseRedirect(reverse('reportsite:updatecrimes'))
             #https://stackoverflow.com/questions/3420122/filter-dict-to-contain-only-certain-keys
             #sign value with secret key using built in django encryption to save this dict for later
             value=signing.dumps({field:user[field] for field in ['role','id']})
@@ -126,7 +156,7 @@ def login(request):
         #if user no exist, redirect back to page (TODO: add error message for login failure)
     except ValueError:
         pass
-        #probably nothing sent, just gonna ignore that..
+        #probably nothing sent, just gonna pretend we didn't that..
     return HttpResponseRedirect(reverse('reportsite:home'))
 
 def logout(request):
