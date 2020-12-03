@@ -34,7 +34,8 @@
                             {#https://stackoverflow.com/questions/4270330/django-show-a-manytomanyfield-in-a-template#}
                             {% for report in reports %}
                                 <a class="list-group-item lstReportsItem flex-row align-items-start p-2"
-                                   role="tab" data-toggle="list" href="#list-{{ report.id }}">
+                                   role="tab" data-toggle="list"
+                                   data-target=".comments-{{ report.id }}, .list-{{ report.id }}">
                                     <h6 class="bold">
                                         Citizen: {{ report.traitor.firstName }} {{ report.traitor.lastName }}</h6>
                                     <h6 class="bold">Time: {{ report.reportTime }}</h6>
@@ -50,32 +51,34 @@
                         </div>
                     </row>
                 </div>
-                <div class="col-sm-8 mt-4 h-auto" >
+                <div class="col-sm-8 mt-4 h-auto">
                     <div class="container">
-                    <div class="row justify-content-md-center h-50">
-                        <div class="col justify-content-center h-100">
-                            <div class="orangebtn p-2 text-center mb-0 mr-4 ml-4" style=" height:20%;">REPORT</div>
-                            <div class="mt-0 p-3 d-flex flex-column mr-4 ml-4 "
-                                 style="background-color: #303030; height:80%; min-height: 150px;">
-                                <div class="tab-content mb-3"  id="tabReportDetailsContent" >
-                                {% for report in reports %}
-                                    <div class="tab-pane fade" id="list-{{ report.id }}" role="tabpanel"
-                                         aria-labelledby="list-profile-list">
-                                        {{ report.remarks }}<br>
-                                        <a>Crimes: </a>
-                                        {% for crime in report.crimeName.all %}
-                                            <a href="#" class="reportDetailsCrimeTypeDesc">{{ crime.crimeName }}</a>
+                        <div class="row justify-content-md-center h-50">
+                            <div class="col justify-content-center h-100">
+                                <div class="orangebtn p-2 text-center mb-0 mr-4 ml-4" style=" height:20%;">REPORT</div>
+                                <div class="mt-0 p-3 d-flex flex-column mr-4 ml-4 "
+                                     style="background-color: #303030; height:80%; min-height: 150px;">
+                                    <div class="tab-content mb-3" id="tabReportDetailsContent">
+                                        {% for report in reports %}
+                                            <div class="tab-pane fade list-{{ report.id }}" id="banan" role="tabpanel"
+                                                 aria-labelledby="list-profile-list">
+                                                {{ report.remarks }}<br><br>
+                                                <a>Crimes: </a>
+                                                {% for crime in report.crimeName.all %}
+                                                    <a href="#"
+                                                       class="reportDetailsCrimeTypeDesc">{{ crime.crimeName }}</a>
+                                                {% endfor %}
+                                            </div>
                                         {% endfor %}
                                     </div>
-                                {% endfor %}
+                                    {% if role is 2 %}
+                                        <div class="mt-auto align-self-center">
+                                            <button class="btn orangebtn  btn-primary d-none"
+                                                    id="btnEscalateReport">Escalate Report
+                                            </button>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% if role is 2 %}
-                                <div class="mt-auto align-self-center">
-                                    <button class="btn orangebtn  btn-primary "
-                                            id="btnEscalateReport">Escalate Report
-                                    </button>
-                                </div>
-                            {% endif %}
                             </div>
                         </div>
                     </div>
@@ -84,7 +87,7 @@
                         <form class="row h-50 justify-content-md-center mt-3"
                               action="{% url 'reportsite:receivecomment' %}" method="post">
 
-                            <div class="row w-100" >
+                            <div class="row w-100">
                                 <div class="col-sm-1">
 
                                 </div>
@@ -99,7 +102,7 @@
                                     {% endfor %}
                                 </div>
                             </div>
-                            <div class="row d-flex justify-content-center w-100 form-group" >
+                            <div class="row d-flex justify-content-center w-100 form-group">
                                 <label for="txtRemarksArea">Comment</label>
                                 <input id="txtReportID" type="text" name="reportID" class="form-control d-none">
                                 <textarea class="form-control mr-3 ml-3" id="txtRemarksArea" name="remarks"
@@ -112,26 +115,75 @@
                         </form>
                     {% endif %}
                     {% if role is 2 %}
-                        <div class="row h-50">safasfs</div>
+                        <input id="txtReportID" type="text" name="reportID" class="form-control d-none">
+                        <div class="container justify-content-md-center mt-1 pl-5 pr-5">
+                            {# having to use padding like this physically disgusts me #}
+                            <div class="row p-1">
+                                <div class="col-sm-6 pt-1 pb-1" style="background-color: green">
+                                    Remarks
+                                </div>
+                                <div class="col-sm-6 pt-1 pb-1" style="background-color: red">
+                                    Rating
+                                </div>
+                            </div>
+                            <div class="tab-content" id="tabComments"
+                                 style="overflow-x: hidden; overflow-y: auto; max-height: 200px;">
+                                {% for report in reports %}
+                                    <div class="row tab-content m-0 p-1 tab-pane fade comments-{{ report.id }}"
+                                         role="tabpanel"
+                                         aria-labelledby="list-profile-list">
+                                        {% for comment in report.comment_set.all %}
+                                            <div class="row mt-1">
+                                                <div class="col-sm-7" style="background-color: black">
+                                                    Informant #{{ comment.informant.id }}<br>
+                                                    <p class="font-italic">{{ comment.content }}</p>
+                                                </div>
+                                                <div class="col-sm-4 d-flex justify-content-center align-items-center"
+                                                     style="background-color: red">
+                                                    <p class="">{{ comment.priority }}</p>
+                                                </div>
+                                                <div class="col-sm-1" style="background-color: black;">
+
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     {% endif %}
-                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        //load crimes into js object
-        data_from_django = {{ crimes }};
-        widget.init(data_from_django);
-        //script for report selectio to pull up report details
 
+        //update hidden input with the value of the selected report
         $(document).ready(function () {
             //what did we do before jquery?
             $('.list-group-item').click(function () {
+                //unhide btnEscalateReport if exists
+                document.getElementById("btnEscalateReport").classList="btn orangebtn  btn-primary";
                 var selectedReport = $(this).children("p").html();
                 $('#txtReportID').val(selectedReport)
             });
         });
+
+        //jquery script for escalation button (adds to investigation queue if successful)
+       $(document).ready(function () {
+            //what did we do before jquery?
+            $('#btnEscalateReport').click(function () {
+                var report=document.getElementById("txtReportID").value;
+                $.post("{% url 'reportsite:receiveescalation' %}",
+                    {
+                        reportID: report
+                    },
+                    function (data) {
+                        alert(data);
+                    });
+            });
+        });
+
     </script>
 {% endblock %}
 </html>

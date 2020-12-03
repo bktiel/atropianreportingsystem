@@ -39,13 +39,17 @@ def review_reports(request):
     cookie=checkCookie(request)
     if cookie is not None:
         totalreports=None
+        #initial filter
+        totalreports=Report.objects.filter(investigationqueue__isnull=True)
         #if cookie role is 2, give full. If 1, give only in their city
         if cookie["role"]==1:
             #get current user city
             currentUserCity=City.objects.get(citizen__id=cookie["id"])
-            totalreports=Report.objects.filter(city=currentUserCity)
+            totalreports=totalreports.filter(city=currentUserCity)
+            #further filter - user can't comment on posts they've commented on already
+            totalreports=totalreports.filter(comment__informant__id__isnull=True)
         elif cookie["role"]==2:
-            totalreports=Report.objects.all()
+            totalreports=totalreports.all()
         else:
             return HttpResponse("UNAUTHORIZED USER",status=403)
         return render(request, 'reviewreports.html',  {'reports':totalreports,'ten':range(11),'loggedIn':True,'role':cookie["role"]})
@@ -68,6 +72,28 @@ def receive_comment(request):
             except:
                 pass
             return HttpResponseRedirect(reverse('reportsite:reportreview'))
+
+def receive_escalation(request):
+    cookie=checkCookie(request)
+    if cookie is not None:
+        report=None
+        try:
+            report=request.POST["reportID"]
+            report=Report.objects.get(id=report)
+        except:
+            return HttpResponse("BAD DATA")
+        #verify sender
+        agent=None
+        try:
+            agent=Citizen.objects.get(id=cookie["id"])
+        except:
+            return HttpResponse("UNAUTHORIZED USER")
+        if agent.role != 2:
+            return HttpResponse("UNAUTHORIZED USER")
+        #otherwise commit
+        newEscalation=InvestigationQueue(agentID=agent,reportID=report,priority=2)
+        newEscalation.save()
+        return HttpResponse("Escalation successful.")
 
 #where agents review city danger
 def review_cities(request):

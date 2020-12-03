@@ -6,6 +6,14 @@ $(document).ready(function() {
     });
 });
 
+//csrf token
+//https://stackoverflow.com/questions/44525167/how-to-set-headers-to-get-or-post-function
+$.ajaxSetup({
+    headers: {
+        'X-CSRFToken': getCookie('csrftoken')
+    }
+});
+
 //utility JS getCookie function from django documentation
 function getCookie(name) {
     let cookieValue = null;
@@ -22,4 +30,16 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
+//https://stackoverflow.com/questions/57220490/single-tab-multiple-content-bootstrap-4
+$(document).ready(function () {
+    $('#lstReports a[data-toggle="list"]').on('show.bs.tab', function (e) {
+        let target = $(e.target).data('target');
+        $(target)
+            .addClass('active show')
+            .siblings('.tab-pane.active')
+            .removeClass('active show')
+    });
+});
 

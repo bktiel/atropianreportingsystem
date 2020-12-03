@@ -120,13 +120,6 @@
             document.getElementById('lstCrimeBox').innerHTML+="<li>"+crime+"</li>";
         });
     });
-
-    //https://stackoverflow.com/questions/44525167/how-to-set-headers-to-get-or-post-function
-    $.ajaxSetup({
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    });
     //submit post request to site containing report
     $(document).ready(function () {
         $("#btnSubmit").on("click", function () {

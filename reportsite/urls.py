@@ -13,5 +13,5 @@ urlpatterns = [
     path('receivecomment', views.receive_comment, name='receivecomment'),
     path('cityreview', views.review_cities, name='cityreview'),
     path('updatecrimes', views.update_crimes, name='updatecrimes'),
-
+    path('receiveescalation', views.receive_escalation, name='receiveescalation'),
     ]
