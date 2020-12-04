@@ -10,3 +10,4 @@ To get up and running locally:
 3) In root directory, run `python manage.py makemigrations` and then `python manage.py migrate`. This will commit the database structure to your local mysql instance.
 4) Finally, run `python manage.py runserver`. Pages should be served at localhost:8000
 
+Optionally, import reportsite/populateCityTables somewhere in the application and call `populateCityTables` and `makeUsers` to create test entries in the database.
