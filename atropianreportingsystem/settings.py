@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # TODO: Change me before deployment
-SECRET_KEY = '=9n#_$!4u%8@walb3ujh37nj)qx4as@6gm244z=74bly-5ngu('
+SECRET_KEY = 'whyisthispublic'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
