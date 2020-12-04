@@ -4,9 +4,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Make Report</title>
 </head>
 {% block content %}
+    <title>Make Report</title>
     <div class="card h-auto w-75 align-self-center mt-4" id="fileReportCard">
         <div class="card-body">
             <h5 class="card-title text-center">CREATE REPORT </h5>
@@ -37,7 +37,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="dropdown col-sm-3">
+			<div class="w-auto p-3">
+                    <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownCrimeButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Select Crime
@@ -49,11 +50,12 @@
                                 {% endfor %}
                         </div>
                     </div>
+			</div>
+                    <div class="col-sm-2 my-auto">
+				    <a class="btn orangebtn d-none" id="btnAddCrime">Add</a>
+		    </div>
                     <div class="col-sm-7 my-auto">
                         <a id="lblCrimeDesc">Description of Crime</a>
-                    </div>
-                    <div class="col-sm-2 my-auto">
-                         <a class="btn orangebtn d-none" id="btnAddCrime">Add</a>
                     </div>
                 </div>
                 <div class="row m-3 justify-content-md-center" id="crimeBox" >
@@ -136,7 +138,10 @@
                     info:information
                 },
                 function(data){
-                    alert(data);
+			if (!alert(data)) 
+			{
+				window.location.href='{%url 'reportsite:report' %}';
+			};
                 });
             });
         });

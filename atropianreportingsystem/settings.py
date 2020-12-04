@@ -27,7 +27,9 @@ SECRET_KEY = '=9n#_$!4u%8@walb3ujh37nj)qx4as@6gm244z=74bly-5ngu('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+            'johnathan.riemerspet.it393.eecs.net'
+        ]
 
 
 # Application definition
@@ -84,7 +86,7 @@ DATABASES = {
         'NAME': 'reportsystem',
         'USER': 'atropia',
         'PASSWORD': 'glorytoatropia',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -127,3 +129,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = "/var/www/atropianreportingsystem/static/"

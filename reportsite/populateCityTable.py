@@ -1,6 +1,8 @@
-from .models import City
+from .models import City, Citizen
 from bs4 import BeautifulSoup
 import requests
+import itertools
+import random
 
 def populateCityTable():
     # page of all cities in azerba- ah, i mean, atropia (dont listen to western deception)
@@ -16,7 +18,28 @@ def populateCityTable():
     for li in soup.find_all('li'):
         if li.a is not None:
             thisName = li.a.get_text()
-            City.objects.create(cityName=thisName)
-
+            newcity=City(cityName=thisName)
+            newcity.save()
 
 #populateCityTable()
+first=["Charlie","Finley","Skyler","Justice","Royal","Lennon","Oakley","Armani","Azariah","Landry","Frankie","Sidney","Denver","Robin","Campbel","Dominiq","Salem","Yael","Murphy","Jael","Ramsey","Hollis","Brighto","Perry","Gentry","Jaidyn","Reilly","Jules","Kylar","Austen","Ocean","Jackie","Storm","Honor","Ryley","Marlo","Nikita","Ridley","Indiana","Taylen","Clarke","Kylin","Eastyn","Payson","Amen","Timber","Cypress","Lake","Jaziah","Dakotah"]
+
+
+def makeUsers():
+    names=list(itertools.combinations(first,2))
+    random.shuffle(names)
+    for index,name in enumerate(names):
+        try:
+            newCitizen=Citizen()
+            newCitizen.id=111023+index
+            newCitizen.city=City.objects.get(pk=random.randrange(1,66))
+            newCitizen.firstName=name[0]
+            newCitizen.lastName=name[1]
+            #https://pythonise.com/categories/python/python-password-hashing-bcrypt
+            newCitizen.password="password"
+            newCitizen.role=random.choice([0,0,0,0,1,1,1,2,2,3])
+            newCitizen.save()
+        except:
+            break
+
+#makeUsers()

@@ -7,6 +7,7 @@
     <title>Review Reports</title>
 </head>
 {% block content %}
+<title>Review Reports</title>
     <div class="card h-auto align-self-center mt-4" style="width: 90%" id="reviewReportCard">
         <div class="card-body">
             {#            <h5 class="card-title text-center">REVIEW REPORTS</h5>#}
@@ -73,7 +74,7 @@
                                     </div>
                                     {% if role is 2 %}
                                         <div class="mt-auto align-self-center">
-                                            <button class="btn orangebtn  btn-primary d-none"
+                                            <button class="btn orangebtn btn-primary"
                                                     id="btnEscalateReport">Escalate Report
                                             </button>
                                         </div>
@@ -163,11 +164,19 @@
             //what did we do before jquery?
             $('.list-group-item').click(function () {
                 //unhide btnEscalateReport if exists
-                document.getElementById("btnEscalateReport").classList="btn orangebtn  btn-primary";
+		    if ($("#btnEscalateReport").length){
+			    $("#btnEscalateReport").show();
+		    }
                 var selectedReport = $(this).children("p").html();
                 $('#txtReportID').val(selectedReport)
             });
         });
+	//btnEscalation hidden by default
+	$(document).ready(function () {
+		if ($("#btnEscalateReport").length){
+			$("#btnEscalateReport").hide();
+		}
+	});
 
         //jquery script for escalation button (adds to investigation queue if successful)
        $(document).ready(function () {
@@ -179,7 +188,9 @@
                         reportID: report
                     },
                     function (data) {
-                        alert(data);
+			    if (!alert(data)) {
+				    window.location.href='{%url 'reportsite:reportreview' %}';
+			    };
                     });
             });
         });

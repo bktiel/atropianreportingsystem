@@ -1,6 +1,6 @@
 from logging import exception
 
-import bs4
+import bs4, bcrypt
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -17,12 +17,22 @@ from django.core import signing
 import json
 from .populateCityTable import populateCityTable
 
+
 COOKIENAME="reportsystem"
 MAX_SEVERITY=80
 
 #actually login page
 def home_page(request):
     #render this specific request on the given template
+#    for record in Citizen.objects.all():
+#        #hash password
+#        salt = bcrypt.gensalt()
+#        #pass must be in bytes before being processed by bcrypt
+#        password=str(record.password).encode('utf-8')
+#        hashed = bcrypt.hashpw(password, salt)
+#        #store hashed password, decode before committing to get string not pythonic text repr
+#        record.password=hashed.decode('utf-8')
+#        record.save()
     return render(request, 'home.html', {'loggedIn':False})
 
 #make a report page
@@ -189,13 +199,14 @@ def receive_crime_update(request):
 def login(request):
     try:
         user=request.POST["id"]
-        password=request.POST["pass"]
+        password=str(request.POST["pass"]).encode('utf-8')
         # check database for login entry
-        query=Citizen.objects.filter(id=user,password=password)
+        query=Citizen.objects.filter(id=user).values()[0]
+        queryPW=str(query["password"]).encode('utf-8')
         #if positive match
-        if query.exists():
+        if bcrypt.checkpw(password,queryPW):
             #make response with cookie
-            user=query.values()[0]
+            user=query
             #user found, redirect to page when done
             #different endpoint depending on user role
             response=None
@@ -237,7 +248,7 @@ def receive_report(request):
             traitor_first,traitor_last=request.POST["citizen"].split()
         except:
 
-            return HttpResponse("Failure")
+            return HttpResponse("Failure. Bad data was sent. Lament in your disgrace.")
         city=request.POST["city"].strip()
         info=request.POST["info"]
         #validate data before doing anything intensive
@@ -277,11 +288,11 @@ def receive_report(request):
                 newRecord.save()
             except Exception as e:
                 print("Error",e)
-                return HttpResponse("Failure")
-            return HttpResponse("Success")
+                return HttpResponse("Failure. Bad data was sent.")
+            return HttpResponse("Success. Report was submitted.")
 
         #Failure
-        return HttpResponse("Failure")
+        return HttpResponse("Failure. Report unsubmitted.")
 
 
 #check cookies, return cookie contents

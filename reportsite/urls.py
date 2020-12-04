@@ -1,6 +1,8 @@
 #import all local views
 from reportsite import views
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 app_name = 'reportsite'
 #all the links and such
 urlpatterns = [
@@ -15,4 +17,4 @@ urlpatterns = [
     path('updatecrimes', views.update_crimes, name='updatecrimes'),
     path('receiveescalation', views.receive_escalation, name='receiveescalation'),
     path('receivecrimeupdate', views.receive_crime_update, name='receivecrimeupdate'),
-    ]
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
