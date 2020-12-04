@@ -24,15 +24,6 @@ MAX_SEVERITY=80
 #actually login page
 def home_page(request):
     #render this specific request on the given template
-#    for record in Citizen.objects.all():
-#        #hash password
-#        salt = bcrypt.gensalt()
-#        #pass must be in bytes before being processed by bcrypt
-#        password=str(record.password).encode('utf-8')
-#        hashed = bcrypt.hashpw(password, salt)
-#        #store hashed password, decode before committing to get string not pythonic text repr
-#        record.password=hashed.decode('utf-8')
-#        record.save()
     return render(request, 'home.html', {'loggedIn':False})
 
 #make a report page
