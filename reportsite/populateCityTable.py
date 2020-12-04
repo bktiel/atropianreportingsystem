@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 import itertools
 import random
+import bcrypt
 
 def populateCityTable():
     # page of all cities in azerba- ah, i mean, atropia (dont listen to western deception)
@@ -22,9 +23,8 @@ def populateCityTable():
             newcity.save()
 
 #populateCityTable()
+
 first=["Charlie","Finley","Skyler","Justice","Royal","Lennon","Oakley","Armani","Azariah","Landry","Frankie","Sidney","Denver","Robin","Campbel","Dominiq","Salem","Yael","Murphy","Jael","Ramsey","Hollis","Brighto","Perry","Gentry","Jaidyn","Reilly","Jules","Kylar","Austen","Ocean","Jackie","Storm","Honor","Ryley","Marlo","Nikita","Ridley","Indiana","Taylen","Clarke","Kylin","Eastyn","Payson","Amen","Timber","Cypress","Lake","Jaziah","Dakotah"]
-
-
 def makeUsers():
     names=list(itertools.combinations(first,2))
     random.shuffle(names)
@@ -36,10 +36,13 @@ def makeUsers():
             newCitizen.firstName=name[0]
             newCitizen.lastName=name[1]
             #https://pythonise.com/categories/python/python-password-hashing-bcrypt
+            #pass must be in bytes before being processed by bcrypt
+            password="password".encode('utf-8')
+            salt = bcrypt.gensalt()
+            hashed = bcrypt.hashpw(password, salt)
+            #store hashed password, decode before committing to get string not pythonic text repr
+            newCitizen.password=hashed.decode('utf-8')
             newCitizen.password="password"
             newCitizen.role=random.choice([0,0,0,0,1,1,1,2,2,3])
             newCitizen.save()
-        except:
-            break
-
 #makeUsers()
